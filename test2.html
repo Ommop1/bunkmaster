@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Batch D2 Attendance Tracker | F.E. C (IT) - Mumbai University</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * {
+      transition: background-color 0.15s ease, border-color 0.15s ease;
+    }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(148, 163, 184, 0.4);
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
+
+  <!-- TOP HEADER -->
+  <header class="sticky top-0 z-40 bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-3">
+      <!-- Title & Details -->
+      <div class="flex items-center gap-3">
+        <div class="h-11 w-11 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center text-white shadow-lg shadow-indigo-600/30">
+          <i class="fa-solid fa-graduation-cap text-xl"></i>
+        </div>
+        <div>
+          <div class="flex items-center gap-2 flex-wrap">
+            <h1 class="font-bold text-base sm:text-lg text-slate-900 dark:text-white">F.E. Div C (IT) &bull; <span class="text-indigo-600 dark:text-indigo-400 font-extrabold">Batch D2</span></h1>
+            <span id="userBadge" class="text-[11px] px-2.5 py-0.5 rounded-full bg-indigo-50 dark:bg-indigo-950/80 text-indigo-700 dark:text-indigo-300 font-semibold border border-indigo-200 dark:border-indigo-800">Student Log</span>
+          </div>
+          <div class="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2 flex-wrap">
+            <span>Class In-charge: <strong>Mr. Abhishek Laharia</strong></span>
+            <span>&bull;</span>
+            <span>Room 304</span>
+            <span>&bull;</span>
+            <span class="text-indigo-600 dark:text-indigo-400 font-medium">MU Ordinance 0.6086</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex items-center gap-2">
+        <button id="themeToggleBtn" onclick="toggleDarkMode()" title="Toggle Theme" class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300">
+          <i class="fa-solid fa-moon dark:hidden"></i>
+          <i class="fa-solid fa-sun hidden dark:inline"></i>
+        </button>
+
+        <button onclick="openTimetableModal()" class="flex items-center gap-1.5 px-3 py-2 text-xs sm:text-sm font-semibold rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200">
+          <i class="fa-solid fa-calendar-week text-indigo-500"></i>
+          <span>Full Timetable</span>
+        </button>
+
+        <button onclick="openSettingsModal()" class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300" title="Data Backup & Reset">
+          <i class="fa-solid fa-gear"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- OVERVIEW DASHBOARD & EXAM ELIGIBILITY METER -->
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      <!-- Overall Stats Card -->
+      <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-sm flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-4 flex-wrap gap-2">
+            <div>
+              <span class="text-xs font-semibold tracking-wider uppercase text-slate-400">Aggregate Summary</span>
+              <h2 class="text-xl font-bold text-slate-900 dark:text-white">Batch D2 Overall Attendance</h2>
+            </div>
+            <div id="overallStatusBadge" class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
+              Calculating...
+            </div>
+          </div>
+
+          <div class="grid grid-cols-3 gap-3 my-4">
+            <div class="bg-slate-50 dark:bg-slate-800/60 p-3 sm:p-4 rounded-xl border border-slate-100 dark:border-slate-800">
+              <span class="text-xs text-slate-500 dark:text-slate-400 block mb-0.5">Overall %</span>
+              <span id="overallPercentage" class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">0%</span>
+            </div>
+            <div class="bg-slate-50 dark:bg-slate-800/60 p-3 sm:p-4 rounded-xl border border-slate-100 dark:border-slate-800">
+              <span class="text-xs text-slate-500 dark:text-slate-400 block mb-0.5">Attended</span>
+              <span id="totalAttendedCount" class="text-2xl sm:text-3xl font-extrabold text-emerald-600 dark:text-emerald-400">0</span>
+            </div>
+            <div class="bg-slate-50 dark:bg-slate-800/60 p-3 sm:p-4 rounded-xl border border-slate-100 dark:border-slate-800">
+              <span class="text-xs text-slate-500 dark:text-slate-400 block mb-0.5">Total Held</span>
+              <span id="totalLecturesCount" class="text-2xl sm:text-3xl font-extrabold text-slate-700 dark:text-slate-300">0</span>
+            </div>
+          </div>
+
+          <!-- Progress Bar -->
+          <div class="w-full bg-slate-100 dark:bg-slate-800 h-3.5 rounded-full overflow-hidden p-0.5 border border-slate-200 dark:border-slate-700 relative">
+            <div class="absolute left-[60%] top-0 bottom-0 w-0.5 bg-rose-500/80 z-10" title="60% Detention Cutoff"></div>
+            <div class="absolute left-[75%] top-0 bottom-0 w-0.5 bg-amber-400 z-10" title="75% Statutory Cutoff"></div>
+            <div class="absolute left-[80%] top-0 bottom-0 w-0.5 bg-emerald-400 z-10" title="80% Safety Buffer"></div>
+            <div id="overallProgressBar" class="h-full rounded-full transition-all duration-500 bg-emerald-500" style="width: 0%"></div>
+          </div>
+
+          <div class="flex justify-between items-center text-[11px] sm:text-xs text-slate-400 mt-2 font-medium">
+            <span class="text-rose-500">&lt;60% (Detention Danger)</span>
+            <span class="text-amber-500">60%-74% (Condonation Risk)</span>
+            <span class="text-emerald-600 dark:text-emerald-400 font-bold">&ge;75% (MU Safe Limit)</span>
+          </div>
+        </div>
+
+        <!-- Bunk / Attend Prediction -->
+        <div id="overallPredictionBox" class="mt-4 p-3.5 rounded-xl text-xs sm:text-sm flex items-start gap-3 bg-indigo-50 dark:bg-indigo-950/40 text-indigo-900 dark:text-indigo-200 border border-indigo-100 dark:border-indigo-900/50">
+          <i class="fa-solid fa-calculator mt-0.5 text-indigo-600 dark:text-indigo-400"></i>
+          <div id="overallPredictionText">Analyzing your attendance records...</div>
+        </div>
+      </div>
+
+      <!-- MU Ordinance & Clearance Status -->
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-sm flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <i class="fa-solid fa-shield-halved text-indigo-500"></i>
+              MU Ordinance 0.6086
+            </h3>
+            <span class="text-[10px] px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 font-mono text-slate-500">Official</span>
+          </div>
+          
+          <p class="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mb-4">
+            Mumbai University mandates a minimum aggregate of <strong>75%</strong> to obtain exam hall tickets and term-work clearance. Falling under 60% triggers mandatory defaulter undertakings and parent calls.
+          </p>
+
+          <!-- Clearance Checklist -->
+          <div class="space-y-3">
+            <div id="iatStatusBox" class="p-3 rounded-xl border flex items-center justify-between text-xs sm:text-sm">
+              <div class="flex items-center gap-2.5">
+                <i id="iatStatusIcon" class="fa-solid fa-circle-check text-emerald-500 text-base"></i>
+                <div>
+                  <div class="font-bold">IAT 1 & 2 Exam Clearance</div>
+                  <div id="iatStatusSub" class="text-[11px] text-slate-500">Needs &ge; 75% aggregate</div>
+                </div>
+              </div>
+              <span id="iatStatusBadge" class="px-2 py-0.5 rounded font-semibold text-xs">Eligible</span>
+            </div>
+
+            <div id="endSemStatusBox" class="p-3 rounded-xl border flex items-center justify-between text-xs sm:text-sm">
+              <div class="flex items-center gap-2.5">
+                <i id="endSemStatusIcon" class="fa-solid fa-circle-check text-emerald-500 text-base"></i>
+                <div>
+                  <div class="font-bold">End-Sem Hall Ticket</div>
+                  <div id="endSemStatusSub" class="text-[11px] text-slate-500">Term Work Grant</div>
+                </div>
+              </div>
+              <span id="endSemStatusBadge" class="px-2 py-0.5 rounded font-semibold text-xs">Cleared</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500">
+          <span>Defaulter Courses (&lt;75%):</span>
+          <span id="defaulterCountBadge" class="font-bold px-2 py-0.5 rounded bg-rose-50 text-rose-600 dark:bg-rose-950 dark:text-rose-400">0 courses flagged</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- TABS BAR -->
+    <div class="flex border-b border-slate-200 dark:border-slate-800 space-x-6 text-sm font-semibold">
+      <button id="tabTodayBtn" onclick="switchTab('today')" class="tab-button pb-3 border-b-2 border-indigo-600 text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
+        <i class="fa-solid fa-calendar-day"></i>
+        <span>Today's D2 Schedule</span>
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+      </button>
+
+      <button id="tabSubjectsBtn" onclick="switchTab('subjects')" class="tab-button pb-3 border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 flex items-center gap-2">
+        <i class="fa-solid fa-book-open"></i>
+        <span>Subject Breakdown</span>
+        <span id="subjectCountPill" class="text-xs px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">0</span>
+      </button>
+    </div>
+
+    <!-- TAB 1: TODAY'S D2 SCHEDULE QUICK LOGGER -->
+    <section id="tab-today" class="space-y-4">
+      <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 sm:p-6 shadow-sm">
+        
+        <!-- Day Navigation Bar -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-slate-800">
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 id="currentDayHeader" class="text-lg font-bold text-slate-900 dark:text-white">Monday Routine</h3>
+              <span id="todayTagBadge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 uppercase tracking-wide">Today</span>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Mark daily lectures as Present (+1) or Absent (+0/1)</p>
+          </div>
+
+          <!-- Day Switcher Pills -->
+          <div class="flex items-center gap-1 overflow-x-auto pb-1 max-w-full">
+            <button onclick="setScheduleDay('Monday')" class="day-select-pill px-3 py-1.5 rounded-xl text-xs font-semibold transition" data-day="Monday">Mon</button>
+            <button onclick="setScheduleDay('Tuesday')" class="day-select-pill px-3 py-1.5 rounded-xl text-xs font-semibold transition" data-day="Tuesday">Tue</button>
+            <button onclick="setScheduleDay('Wednesday')" class="day-select-pill px-3 py-1.5 rounded-xl text-xs font-semibold transition" data-day="Wednesday">Wed</button>
+            <button onclick="setScheduleDay('Thursday')" class="day-select-pill px-3 py-1.5 rounded-xl text-xs font-semibold transition" data-day="Thursday">Thu</button>
+            <button onclick="setScheduleDay('Friday')" class="day-select-pill px-3 py-1.5 rounded-xl text-xs font-semibold transition" data-day="Friday">Fri</button>
+            <button onclick="setScheduleDay('Saturday')" class="day-select-pill px-3 py-1.5 rounded-xl text-xs font-semibold transition" data-day="Saturday">Sat (1,3,5)</button>
+          </div>
+        </div>
+
+        <!-- Schedule Slots List -->
+        <div id="scheduleSlotsList" class="mt-4 space-y-3">
+          <!-- Dynamically populated -->
+        </div>
+
+        <!-- Bulk Mark Bar -->
+        <div class="mt-5 pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3">
+          <span class="text-xs text-slate-500 dark:text-slate-400">Batch actions for this day:</span>
+          <div class="flex items-center gap-2">
+            <button onclick="bulkMarkCurrentDay(true)" class="text-xs px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-semibold rounded-xl transition">
+              <i class="fa-solid fa-check-double mr-1"></i> Mark All Attended
+            </button>
+            <button onclick="bulkMarkCurrentDay(false)" class="text-xs px-3 py-1.5 bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/60 dark:hover:bg-rose-900 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 font-semibold rounded-xl transition">
+              <i class="fa-solid fa-xmark mr-1"></i> Mark All Absent
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: SUBJECT-WISE BREAKDOWN -->
+    <section id="tab-subjects" class="hidden space-y-4">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h3 class="text-lg font-bold text-slate-900 dark:text-white">Individual Course Attendance</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Batch D2 theory subjects and assigned laboratory practicals</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <select id="courseFilter" onchange="renderSubjects()" class="text-xs sm:text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-700 dark:text-slate-200">
+            <option value="all">All Subjects & Labs</option>
+            <option value="Theory">Theory Only</option>
+            <option value="Lab">Labs / Practicals Only</option>
+            <option value="defaulter">Defaulters (&lt;75%)</option>
+            <option value="safe">Safe (&ge;75%)</option>
+          </select>
+          <button onclick="openAddCourseModal()" class="text-xs sm:text-sm px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-medium shadow-sm transition">
+            <i class="fa-solid fa-plus mr-1"></i> Add Custom
+          </button>
+        </div>
+      </div>
+
+      <!-- Subject Cards Grid -->
+      <div id="subjectsContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <!-- Rendered via JS -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL: FULL TIMETABLE -->
+  <div id="timetableModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-4xl max-h-[90vh] flex flex-col shadow-2xl relative">
+      <div class="p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+        <div>
+          <h3 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white">Batch D2 Timetable (FE Div C - IT)</h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400">Class In-Charge: Mr. Abhishek Laharia | Room: 304</p>
+        </div>
+        <button onclick="closeTimetableModal()" class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-xl">
+          <i class="fa-solid fa-xmark text-lg"></i>
+        </button>
+      </div>
+
+      <div class="p-5 overflow-y-auto space-y-4">
+        <!-- Faculty & Subject Reference Table -->
+        <div class="bg-slate-50 dark:bg-slate-800/40 rounded-xl p-3 border border-slate-200 dark:border-slate-800 text-xs">
+          <span class="font-bold text-slate-700 dark:text-slate-300 block mb-2">Faculty & Course Directory</span>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px] text-slate-600 dark:text-slate-400">
+            <div><strong class="text-slate-800 dark:text-slate-200">AM-I:</strong> Dr. Shubham Tripathi (ST)</div>
+            <div><strong class="text-slate-800 dark:text-slate-200">AP:</strong> Dr. Vivek Singh (VS)</div>
+            <div><strong class="text-slate-800 dark:text-slate-200">AC:</strong> Dr. Sheetal Palande (SP)</div>
+            <div><strong class="text-slate-800 dark:text-slate-200">EM:</strong> Dr. Shivam Shukla (SS)</div>
+            <div><strong class="text-slate-800 dark:text-slate-200">BEEE:</strong> Mr. Abhishek Laharia (AL)</div>
+            <div><strong class="text-slate-800 dark:text-slate-200">PCE:</strong> Ms. Sadiqa Beg (SB)</div>
+            <div><strong class="text-slate-800 dark:text-slate-200">CP:</strong> Ms. Soumyamol P.S. (SPS)</div>
+            <div><strong class="text-slate-800 dark:text-slate-200">BW-I / UHV:</strong> Workshop & Ethics</div>
+          </div>
+        </div>
+
+        <div id="fullTimetableViewer" class="space-y-3">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: ADD / EDIT COURSE -->
+  <div id="courseModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
+      <button onclick="closeCourseModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+
+      <h3 id="courseModalTitle" class="text-lg font-bold text-slate-900 dark:text-white mb-4">Edit Course Attendance</h3>
+      
+      <form id="courseForm" onsubmit="handleCourseSubmit(event)" class="space-y-4">
+        <input type="hidden" id="editCourseId">
+        
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Subject / Lab Name</label>
+          <input type="text" id="courseNameInput" required class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Course Type</label>
+            <select id="courseTypeInput" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none">
+              <option value="Theory">Theory</option>
+              <option value="Lab">Lab Practical (Batch D2)</option>
+              <option value="Workshop">Workshop / Activity</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Target % (MU)</label>
+            <input type="number" id="courseTargetInput" min="50" max="100" value="75" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Attended Classes</label>
+            <input type="number" id="courseAttendedInput" min="0" required class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Total Classes Held</label>
+            <input type="number" id="courseTotalInput" min="0" required class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none">
+          </div>
+        </div>
+
+        <div class="pt-2 flex gap-3">
+          <button type="button" onclick="closeCourseModal()" class="flex-1 px-4 py-2 text-sm rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800">
+            Cancel
+          </button>
+          <button type="submit" class="flex-1 px-4 py-2 text-sm rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold">
+            Save
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: SETTINGS & IN-APP CONFIRMATION RESET -->
+  <div id="settingsModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm hidden">
+    <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl w-full max-w-md p-6 shadow-2xl relative">
+      <button onclick="closeSettingsModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+        <i class="fa-solid fa-xmark text-lg"></i>
+      </button>
+
+      <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-1">Settings & Data Management</h3>
+      <p class="text-xs text-slate-500 mb-4">Export backup, set profile name, or reset records safely.</p>
+      
+      <div class="space-y-4">
+        <!-- User Profile Tag -->
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Your Name / Roll No.</label>
+          <div class="flex gap-2">
+            <input type="text" id="profileNameInput" placeholder="e.g., Omm (D38)" class="flex-1 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2 text-xs text-slate-900 dark:text-white focus:outline-none">
+            <button onclick="saveProfileName()" class="px-3 py-2 bg-indigo-600 text-white rounded-xl text-xs font-semibold hover:bg-indigo-700">Save</button>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-2">Backup & Sync</label>
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="exportData()" class="px-3 py-2 rounded-xl text-xs bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 font-semibold flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-download"></i> Export JSON
+            </button>
+            <label class="px-3 py-2 rounded-xl text-xs bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 font-semibold flex items-center justify-center gap-1.5 cursor-pointer text-center">
+              <i class="fa-solid fa-upload"></i> Import JSON
+              <input type="file" id="importFileInput" onchange="importData(event)" class="hidden" accept=".json">
+            </label>
+          </div>
+        </div>
+
+        <!-- Safe In-App Confirmation Reset Buttons -->
+        <div class="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-2">
+          <label class="block text-xs font-semibold text-slate-700 dark:text-slate-300">Reset Options</label>
+          
+          <button onclick="executeResetToOfficial()" class="w-full text-xs px-3 py-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 dark:hover:bg-indigo-900 font-medium transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-rotate-left"></i> Reset to Oct 30 Baseline (90.3% / 130 of 144)
+          </button>
+          
+          <button onclick="executeResetToZero()" class="w-full text-xs px-3 py-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-900 hover:bg-rose-100 dark:hover:bg-rose-900 font-medium transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-trash-can"></i> Reset All Subjects to Zero (0/0)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-16 opacity-0 transition-all duration-300 bg-slate-900 text-white dark:bg-white dark:text-slate-900 px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 text-sm pointer-events-none">
+    <i id="toastIcon" class="fa-solid fa-circle-check text-emerald-400 dark:text-emerald-600"></i>
+    <span id="toastMessage">Logged successfully</span>
+  </div>
+
+  <!-- JAVASCRIPT APPLICATION LOGIC -->
+  <script>
+    // D2 BASELINE TEMPLATE (October 30, 2026 Official Sheet)
+    const BASELINE_D2_COURSES = [
+      { id: 'c-am1', code: 'AM-I', name: 'Applied Mathematics-I (Theory)', faculty: 'Dr. Shubham Tripathi (ST)', type: 'Theory', attended: 22, total: 23, target: 75 },
+      { id: 'c-ap', code: 'AP', name: 'Applied Physics (Theory)', faculty: 'Dr. Vivek Singh (VS)', type: 'Theory', attended: 13, total: 16, target: 75 },
+      { id: 'c-ac', code: 'AC', name: 'Applied Chemistry (Theory)', faculty: 'Dr. Sheetal Palande (SP)', type: 'Theory', attended: 15, total: 15, target: 75 },
+      { id: 'c-em', code: 'EM', name: 'Engineering Mechanics (Theory)', faculty: 'Dr. Shivam Shukla (SS)', type: 'Theory', attended: 29, total: 29, target: 75 },
+      { id: 'c-beee', code: 'BEEE', name: 'Basic Electrical & Electronics (Theory)', faculty: 'Mr. Abhishek Laharia / Raashid', type: 'Theory', attended: 18, total: 25, target: 75 },
+      { id: 'c-pce', code: 'PCE', name: 'Prof. & Communication Ethics (Theory)', faculty: 'Ms. Sadiqa Beg (SB)', type: 'Theory', attended: 10, total: 12, target: 75 },
+      { id: 'c-cp', code: 'CP', name: 'C Programming (Theory)', faculty: 'Ms. Soumyamol P.S.', type: 'Theory', attended: 10, total: 14, target: 75 },
+      { id: 'c-uhv', code: 'UHV', name: 'Universal Human Values (UHV)', faculty: 'Ms. Neha Singh', type: 'Theory', attended: 9, total: 10, target: 75 },
+      { id: 'c-lab-am1', code: 'AM-I Tut', name: 'AM-I Tutorial', faculty: 'Dr. Shubham Tripathi', room: 'Room 309A', type: 'Lab', attended: 4, total: 4, target: 75 },
+      { id: 'c-lab-ap', code: 'AP Lab (D2)', name: 'AP Lab (Batch D2)', faculty: 'Dr. Vivek Singh', room: 'Lab 101', type: 'Lab', attended: 4, total: 4, target: 75 },
+      { id: 'c-lab-ac', code: 'AC Lab (D2)', name: 'AC Lab (Batch D2)', faculty: 'Dr. Sheetal Palande', room: 'Lab 102', type: 'Lab', attended: 4, total: 4, target: 75 },
+      { id: 'c-lab-em', code: 'EM Lab (D2)', name: 'EM Lab (Batch D2)', faculty: 'Dr. Shivam Shukla', room: 'Lab 204', type: 'Lab', attended: 8, total: 8, target: 75 },
+      { id: 'c-lab-beee', code: 'BEEE Lab (D2)', name: 'BEEE Lab (Batch D2)', faculty: 'Mr. Abhishek Laharia', room: 'Lab 203', type: 'Lab', attended: 8, total: 8, target: 75 },
+      { id: 'c-lab-pce', code: 'PCE Lab (D2)', name: 'PCE Lab (Batch D2)', faculty: 'Ms. Sadiqa Beg', room: 'Room 209', type: 'Lab', attended: 8, total: 8, target: 75 },
+      { id: 'c-lab-cp', code: 'CP Lab (D2)', name: 'CP Lab (Batch D2)', faculty: 'Ms. Soumyamol P.S. / Priti', room: 'Lab 415', type: 'Lab', attended: 4, total: 5, target: 75 },
+      { id: 'c-bw1', code: 'BW-I', name: 'Engineering Workshop-I', faculty: 'Mr. Sagar Mhatre', room: 'Workshop Lab', type: 'Workshop', attended: 8, total: 8, target: 75 },
+      { id: 'c-lib', code: 'Library', name: 'Library Session', faculty: 'Mr. Dinesh Gadge', room: 'Library', type: 'Workshop', attended: 4, total: 4, target: 75 }
+    ];
+
+    // BATCH D2 WEEKLY TIMETABLE
+    const D2_SCHEDULE = {
+      Monday: [
+        { slot: 'Slot 1', time: '08:05 - 09:05 am', courseId: 'c-am1', title: 'AM-I (Theory)', room: 'Room 304' },
+        { slot: 'Slot 2 & 3', time: '09:05 - 11:05 am', courseId: 'c-lab-pce', title: 'D2: PCE Lab', room: 'Room 209 (2 hrs)', isLab: true },
+        { slot: 'Break', time: '11:05 - 11:20 am', isBreak: true, title: 'Short Break' },
+        { slot: 'Slot 4', time: '11:20 - 12:20 pm', courseId: 'c-ap', title: 'AP (Theory)', room: 'Room 304' },
+        { slot: 'Slot 5', time: '12:20 - 01:20 pm', courseId: 'c-em', title: 'EM (Theory)', room: 'Room 304' },
+        { slot: 'Break', time: '01:20 - 02:00 pm', isBreak: true, title: 'Lunch Break' },
+        { slot: 'Slot 6 & 7', time: '02:00 - 04:00 pm', courseId: 'c-lab-em', title: 'D2: EM Lab', room: 'Room 204 (2 hrs)', isLab: true },
+        { slot: 'Slot 8', time: '04:00 - 05:00 pm', courseId: 'c-ac', title: 'AC (Theory)', room: 'Room 304' }
+      ],
+      Tuesday: [
+        { slot: 'Slot 1', time: '08:05 - 09:05 am', courseId: 'c-am1', title: 'AM-I (Theory)', room: 'Room 304' },
+        { slot: 'Slot 2', time: '09:05 - 10:05 am', courseId: 'c-em', title: 'EM (Theory)', room: 'Room 304' },
+        { slot: 'Slot 3', time: '10:05 - 11:05 am', courseId: 'c-pce', title: 'PCE (Theory)', room: 'Room 304' },
+        { slot: 'Break', time: '11:05 - 11:20 am', isBreak: true, title: 'Short Break' },
+        { slot: 'Slot 4 & 5', time: '11:20 - 01:20 pm', courseId: 'c-bw1', title: 'Basic Workshop-I (BW-I)', room: 'Workshop (2 hrs)' },
+        { slot: 'Break', time: '01:20 - 02:00 pm', isBreak: true, title: 'Lunch Break' },
+        { slot: 'Slot 6', time: '02:00 - 03:00 pm', courseId: 'c-cp', title: 'CP (Theory)', room: 'Room 304' },
+        { slot: 'Slot 7 & 8', time: '03:00 - 05:00 pm', courseId: 'c-beee', title: 'BEEE (Theory - 2 hrs)', room: 'Room 304' }
+      ],
+      Wednesday: [
+        { slot: 'Slot 1', time: '08:05 - 09:05 am', courseId: 'c-ac', title: 'AC (Theory)', room: 'Room 304' },
+        { slot: 'Slot 2 & 3', time: '09:05 - 11:05 am', courseId: 'c-lab-ac', title: 'D2: AC Lab', room: 'Lab 102 (2 hrs)', isLab: true },
+        { slot: 'Break', time: '11:05 - 11:20 am', isBreak: true, title: 'Short Break' },
+        { slot: 'Slot 4', time: '11:20 - 12:20 pm', courseId: 'c-em', title: 'EM (Theory)', room: 'Room 304' },
+        { slot: 'Slot 5', time: '12:20 - 01:20 pm', courseId: 'c-em', title: 'EM (Theory)', room: 'Room 304' },
+        { slot: 'Break', time: '01:20 - 02:00 pm', isBreak: true, title: 'Lunch Break' },
+        { slot: 'Slot 6 & 7', time: '02:00 - 04:00 pm', courseId: 'c-lab-cp', title: 'D2: CP Lab', room: 'Room 415 (2 hrs)', isLab: true },
+        { slot: 'Slot 8', time: '04:00 - 05:00 pm', courseId: 'c-ap', title: 'AP (Theory)', room: 'Room 304' }
+      ],
+      Thursday: [
+        { slot: 'Slot 1', time: '08:05 - 09:05 am', courseId: 'c-cp', title: 'CP (Theory)', room: 'Room 304' },
+        { slot: 'Slot 2 & 3', time: '09:05 - 11:05 am', courseId: 'c-lab-beee', title: 'D2: BEEE Lab', room: 'Lab 203 (2 hrs)', isLab: true },
+        { slot: 'Break', time: '11:05 - 11:20 am', isBreak: true, title: 'Short Break' },
+        { slot: 'Slot 4', time: '11:20 - 12:20 pm', courseId: 'c-em', title: 'EM (Theory)', room: 'Room 304' },
+        { slot: 'Slot 5', time: '12:20 - 01:20 pm', courseId: 'c-am1', title: 'AM-I (Theory)', room: 'Room 304' },
+        { slot: 'Break', time: '01:20 - 02:00 pm', isBreak: true, title: 'Lunch Break' },
+        { slot: 'Slot 6', time: '02:00 - 03:00 pm', courseId: 'c-beee', title: 'BEEE (Theory)', room: 'Room 304' },
+        { slot: 'Slot 7', time: '03:00 - 04:00 pm', courseId: 'c-pce', title: 'PCE (Theory)', room: 'Room 304' },
+        { slot: 'Slot 8', time: '04:00 - 05:00 pm', courseId: 'c-uhv', title: 'UHV (Theory)', room: 'Room 304' }
+      ],
+      Friday: [
+        { slot: 'Slot 1', time: '08:05 - 09:05 am', courseId: 'c-beee', title: 'BEEE (Theory)', room: 'Room 304' },
+        { slot: 'Slot 2', time: '09:05 - 10:05 am', courseId: 'c-lib', title: 'D2: Library Session', room: 'Library' },
+        { slot: 'Slot 3', time: '10:05 - 11:05 am', courseId: 'c-lab-ap', title: 'D2: AP Lab', room: 'Lab 101', isLab: true },
+        { slot: 'Break', time: '11:05 - 11:20 am', isBreak: true, title: 'Short Break' },
+        { slot: 'Slot 4', time: '11:20 - 12:20 pm', courseId: 'c-ac', title: 'AC (Theory)', room: 'Room 304' },
+        { slot: 'Slot 5', time: '12:20 - 01:20 pm', courseId: 'c-cp', title: 'CP (Theory)', room: 'Room 304' },
+        { slot: 'Break', time: '01:20 - 02:00 pm', isBreak: true, title: 'Lunch Break' },
+        { slot: 'Slot 6', time: '02:00 - 03:00 pm', courseId: 'c-ap', title: 'AP (Theory)', room: 'Room 304' },
+        { slot: 'Slot 7', time: '03:00 - 04:00 pm', courseId: 'c-am1', title: 'AM-I (Theory)', room: 'Room 304' },
+        { slot: 'Slot 8', time: '04:00 - 05:00 pm', courseId: 'c-uhv', title: 'UHV (Theory)', room: 'Room 304' }
+      ],
+      Saturday: [
+        { slot: 'Slot 1', time: '08:30 - 09:30 am', courseId: 'c-am1', title: 'AM-I (1st, 3rd, 5th Sat)', room: 'Room 304' },
+        { slot: 'Slot 2', time: '09:30 - 10:30 am', courseId: 'c-pce', title: 'PCE (1st, 3rd, 5th Sat)', room: 'Room 304' },
+        { slot: 'Break', time: '10:30 - 11:00 am', isBreak: true, title: 'Short Break' },
+        { slot: 'Slot 3', time: '11:00 - 12:30 pm', courseId: 'c-em', title: 'EM (Extra Lecture)', room: 'Room 304' },
+        { slot: 'Slot 4', time: '12:30 - 02:00 pm', courseId: 'c-beee', title: 'BEEE (Extra Lecture)', room: 'Room 304' }
+      ]
+    };
+
+    // SECURE STORAGE HELPER (Handles iframe sandboxing & privacy modes)
+    const STORAGE_KEY = 'mu_d2_attendance_courses_v4';
+    const PROFILE_KEY = 'mu_d2_user_name_v4';
+    let inMemoryStore = {};
+
+    function safeGet(key) {
+      try {
+        return localStorage.getItem(key);
+      } catch (e) {
+        return inMemoryStore[key] || null;
+      }
+    }
+
+    function safeSet(key, value) {
+      try {
+        localStorage.setItem(key, value);
+      } catch (e) {
+        inMemoryStore[key] = value;
+      }
+    }
+
+    function safeRemove(key) {
+      try {
+        localStorage.removeItem(key);
+      } catch (e) {
+        delete inMemoryStore[key];
+      }
+    }
+
+    let courses = [];
+    let selectedDay = 'Monday';
+
+    function loadData() {
+      const stored = safeGet(STORAGE_KEY);
+      if (stored) {
+        try {
+          courses = JSON.parse(stored);
+        } catch(e) {
+          courses = JSON.parse(JSON.stringify(BASELINE_D2_COURSES));
+        }
+      } else {
+        courses = JSON.parse(JSON.stringify(BASELINE_D2_COURSES));
+      }
+
+      const userName = safeGet(PROFILE_KEY) || 'Omm (D38)';
+      document.getElementById('userBadge').textContent = userName;
+      document.getElementById('profileNameInput').value = userName;
+    }
+
+    function saveData() {
+      safeSet(STORAGE_KEY, JSON.stringify(courses));
+      updateAppUI();
+    }
+
+    function saveProfileName() {
+      const name = document.getElementById('profileNameInput').value.trim() || 'Student';
+      safeSet(PROFILE_KEY, name);
+      document.getElementById('userBadge').textContent = name;
+      showToast(`Profile name updated: ${name}`);
+    }
+
+    // DIRECT IN-APP EXECUTION RESETS (NO SANDBOX BLOCKS)
+    function executeResetToOfficial() {
+      courses = JSON.parse(JSON.stringify(BASELINE_D2_COURSES));
+      saveData();
+      closeSettingsModal();
+      showToast('Attendance restored to Oct 30 Official Sheet (90.3% / 130 of 144)');
+    }
+
+    function executeResetToZero() {
+      courses.forEach(c => {
+        c.attended = 0;
+        c.total = 0;
+      });
+      saveData();
+      closeSettingsModal();
+      showToast('All subjects reset to clean slate (0/0)');
+    }
+
+    // MATH & ORDINANCE ENGINE
+    function getStats() {
+      let totalAttended = 0;
+      let totalConducted = 0;
+
+      courses.forEach(c => {
+        totalAttended += (c.attended || 0);
+        totalConducted += (c.total || 0);
+      });
+
+      const overallPct = totalConducted > 0 ? (totalAttended / totalConducted) * 100 : 0;
+      const roundedPct = Math.round(overallPct * 10) / 10;
+
+      let canBunk = 0;
+      let needToAttend = 0;
+
+      if (overallPct >= 75) {
+        canBunk = Math.floor((100 * totalAttended - 75 * totalConducted) / 75);
+        if (canBunk < 0) canBunk = 0;
+      } else {
+        needToAttend = Math.ceil((75 * totalConducted - 100 * totalAttended) / (100 - 75));
+        if (needToAttend < 0) needToAttend = 0;
+      }
+
+      return {
+        totalAttended,
+        totalConducted,
+        overallPct: roundedPct,
+        canBunk,
+        needToAttend
+      };
+    }
+
+    // UPDATE UI CORE
+    function updateAppUI() {
+      const stats = getStats();
+
+      document.getElementById('overallPercentage').textContent = stats.overallPct + '%';
+      document.getElementById('totalAttendedCount').textContent = stats.totalAttended;
+      document.getElementById('totalLecturesCount').textContent = stats.totalConducted;
+
+      const progressBar = document.getElementById('overallProgressBar');
+      progressBar.style.width = Math.min(100, Math.max(0, stats.overallPct)) + '%';
+
+      const statusBadge = document.getElementById('overallStatusBadge');
+      const predText = document.getElementById('overallPredictionText');
+
+      if (stats.overallPct >= 75) {
+        progressBar.className = 'h-full rounded-full transition-all duration-500 bg-emerald-500';
+        statusBadge.className = 'px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800';
+        statusBadge.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i> MU Compliant (Safe)';
+        
+        predText.innerHTML = `You are comfortably above the <strong>75% MU limit</strong>! You can safely miss up to <strong>${stats.canBunk}</strong> upcoming class(es) without falling below 75%.`;
+      } else if (stats.overallPct >= 60) {
+        progressBar.className = 'h-full rounded-full transition-all duration-500 bg-amber-500';
+        statusBadge.className = 'px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border border-amber-300 dark:border-amber-800';
+        statusBadge.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-1"></i> Condonation Zone';
+
+        predText.innerHTML = `Warning! Current aggregate is <strong>${stats.overallPct}%</strong>. You must attend the next <strong>${stats.needToAttend}</strong> consecutive classes without missing to regain 75% MU clearance.`;
+      } else {
+        progressBar.className = 'h-full rounded-full transition-all duration-500 bg-rose-500';
+        statusBadge.className = 'px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 border border-rose-300 dark:border-rose-800';
+        statusBadge.innerHTML = '<i class="fa-solid fa-skull-crossbones mr-1"></i> Critical Defaulter (&lt;60%)';
+
+        predText.innerHTML = `Critical Risk! Under 60% leads to exam detention list. You need to attend <strong>${stats.needToAttend}</strong> non-stop classes to cross 75%.`;
+      }
+
+      // Exam Eligibility Badges
+      const iatBadge = document.getElementById('iatStatusBadge');
+      const iatSub = document.getElementById('iatStatusSub');
+      const iatIcon = document.getElementById('iatStatusIcon');
+      
+      const endSemBadge = document.getElementById('endSemStatusBadge');
+      const endSemSub = document.getElementById('endSemStatusSub');
+      const endSemIcon = document.getElementById('endSemStatusIcon');
+
+      if (stats.overallPct >= 75) {
+        iatBadge.className = 'px-2 py-0.5 rounded font-bold text-xs bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300';
+        iatBadge.textContent = 'Eligible';
+        iatSub.textContent = 'Clear for IAT 1 & 2 tests';
+        iatIcon.className = 'fa-solid fa-circle-check text-emerald-500 text-base';
+
+        endSemBadge.className = 'px-2 py-0.5 rounded font-bold text-xs bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300';
+        endSemBadge.textContent = 'Allowed';
+        endSemSub.textContent = 'Hall Ticket granted by HOD';
+        endSemIcon.className = 'fa-solid fa-circle-check text-emerald-500 text-base';
+      } else if (stats.overallPct >= 60) {
+        iatBadge.className = 'px-2 py-0.5 rounded font-bold text-xs bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300';
+        iatBadge.textContent = 'Under Review';
+        iatSub.textContent = 'May require mentor bond';
+        iatIcon.className = 'fa-solid fa-triangle-exclamation text-amber-500 text-base';
+
+        endSemBadge.className = 'px-2 py-0.5 rounded font-bold text-xs bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300';
+        endSemBadge.textContent = 'Condonation';
+        endSemSub.textContent = 'Requires Medical/Letter';
+        endSemIcon.className = 'fa-solid fa-triangle-exclamation text-amber-500 text-base';
+      } else {
+        iatBadge.className = 'px-2 py-0.5 rounded font-bold text-xs bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300';
+        iatBadge.textContent = 'Detained';
+        iatSub.textContent = 'Parent letter & meeting required';
+        iatIcon.className = 'fa-solid fa-circle-xmark text-rose-500 text-base';
+
+        endSemBadge.className = 'px-2 py-0.5 rounded font-bold text-xs bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300';
+        endSemBadge.textContent = 'Withheld';
+        endSemSub.textContent = 'Term work detention notice';
+        endSemIcon.className = 'fa-solid fa-circle-xmark text-rose-500 text-base';
+      }
+
+      let defaultersCount = 0;
+      courses.forEach(c => {
+        const pct = c.total > 0 ? (c.attended / c.total) * 100 : 0;
+        if (pct < 75) defaultersCount++;
+      });
+      document.getElementById('defaulterCountBadge').textContent = `${defaultersCount} subject(s) flagged`;
+      document.getElementById('subjectCountPill').textContent = courses.length;
+
+      renderDaySchedule();
+      renderSubjects();
+    }
+
+    // RENDER TODAY / CURRENT DAY SLOTS
+    function renderDaySchedule() {
+      const container = document.getElementById('scheduleSlotsList');
+      container.innerHTML = '';
+
+      const daySlots = D2_SCHEDULE[selectedDay] || [];
+      document.getElementById('currentDayHeader').textContent = `${selectedDay} Routine (Batch D2)`;
+
+      document.querySelectorAll('.day-select-pill').forEach(btn => {
+        if (btn.getAttribute('data-day') === selectedDay) {
+          btn.className = 'day-select-pill px-3 py-1.5 rounded-xl text-xs font-bold transition bg-indigo-600 text-white shadow-sm';
+        } else {
+          btn.className = 'day-select-pill px-3 py-1.5 rounded-xl text-xs font-semibold transition text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800';
+        }
+      });
+
+      if (daySlots.length === 0) {
+        container.innerHTML = `
+          <div class="py-8 text-center text-slate-400 text-sm">
+            <i class="fa-solid fa-mug-hot text-2xl mb-2 text-slate-300 dark:text-slate-600"></i>
+            <p>No classes scheduled for Batch D2 on this day. Enjoy your weekend!</p>
+          </div>
+        `;
+        return;
+      }
+
+      daySlots.forEach(slot => {
+        if (slot.isBreak) {
+          const breakDiv = document.createElement('div');
+          breakDiv.className = 'py-2 px-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-between text-xs text-slate-500';
+          breakDiv.innerHTML = `
+            <span class="flex items-center gap-2"><i class="fa-solid fa-utensils text-slate-400"></i> <strong>${slot.title}</strong></span>
+            <span class="font-mono">${slot.time}</span>
+          `;
+          container.appendChild(breakDiv);
+          return;
+        }
+
+        const course = courses.find(c => c.id === slot.courseId);
+        const card = document.createElement('div');
+        card.className = 'p-3 sm:p-4 rounded-xl bg-white dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-3';
+
+        const pct = course && course.total > 0 ? Math.round((course.attended / course.total) * 100) : 0;
+        let badgeColor = 'bg-slate-100 text-slate-600';
+        if (course && course.total > 0) {
+          if (pct >= 75) badgeColor = 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300';
+          else if (pct >= 60) badgeColor = 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300';
+          else badgeColor = 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300';
+        }
+
+        card.innerHTML = `
+          <div class="flex items-start gap-3">
+            <div class="w-9 h-9 rounded-xl ${slot.isLab ? 'bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-300' : 'bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300'} flex items-center justify-center font-bold text-xs shrink-0 mt-0.5">
+              ${slot.isLab ? '<i class="fa-solid fa-flask"></i>' : '<i class="fa-solid fa-chalkboard-user"></i>'}
+            </div>
+            <div>
+              <div class="flex items-center gap-2 flex-wrap">
+                <span class="font-bold text-sm text-slate-900 dark:text-white">${slot.title}</span>
+                <span class="text-[10px] font-mono px-2 py-0.5 rounded-full ${badgeColor}">${pct}% (${course ? course.attended : 0}/${course ? course.total : 0})</span>
+              </div>
+              <div class="text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2 flex-wrap mt-0.5">
+                <span><i class="fa-regular fa-clock mr-1"></i>${slot.time}</span>
+                <span>&bull;</span>
+                <span><i class="fa-solid fa-location-dot mr-1"></i>${slot.room || 'Room 304'}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Quick Action Buttons -->
+          <div class="flex items-center gap-2 self-end sm:self-center shrink-0">
+            <button onclick="logSlotAttendance('${slot.courseId}', true)" title="Attended" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-950/60 dark:hover:bg-emerald-900 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 flex items-center gap-1.5 transition active:scale-95">
+              <i class="fa-solid fa-check"></i>
+              <span>Present</span>
+            </button>
+            <button onclick="logSlotAttendance('${slot.courseId}', false)" title="Missed / Bunked" class="px-3 py-1.5 rounded-xl text-xs font-semibold bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/60 dark:hover:bg-rose-900 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 flex items-center gap-1.5 transition active:scale-95">
+              <i class="fa-solid fa-xmark"></i>
+              <span>Absent</span>
+            </button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // LOG INDIVIDUAL SLOT
+    function logSlotAttendance(courseId, wasPresent) {
+      const course = courses.find(c => c.id === courseId);
+      if (!course) return;
+
+      course.total = (course.total || 0) + 1;
+      if (wasPresent) {
+        course.attended = (course.attended || 0) + 1;
+        showToast(`Marked Present: ${course.code || course.name}`, true);
+      } else {
+        showToast(`Marked Absent: ${course.code || course.name}`, false);
+      }
+
+      saveData();
+    }
+
+    // BULK MARK FOR CURRENT DAY
+    function bulkMarkCurrentDay(wasPresent) {
+      const daySlots = D2_SCHEDULE[selectedDay] || [];
+      let count = 0;
+
+      daySlots.forEach(slot => {
+        if (!slot.isBreak && slot.courseId) {
+          const c = courses.find(item => item.id === slot.courseId);
+          if (c) {
+            c.total = (c.total || 0) + 1;
+            if (wasPresent) c.attended = (c.attended || 0) + 1;
+            count++;
+          }
+        }
+      });
+
+      if (count > 0) {
+        saveData();
+        showToast(`Logged ${count} lectures as ${wasPresent ? 'Present' : 'Absent'}`);
+      }
+    }
+
+    // RENDER SUBJECTS GRID
+    function renderSubjects() {
+      const container = document.getElementById('subjectsContainer');
+      container.innerHTML = '';
+      const filter = document.getElementById('courseFilter').value;
+
+      courses.forEach(c => {
+        const pct = c.total > 0 ? (c.attended / c.total) * 100 : 0;
+        const rounded = Math.round(pct * 10) / 10;
+
+        if (filter === 'Theory' && c.type !== 'Theory') return;
+        if (filter === 'Lab' && c.type !== 'Lab') return;
+        if (filter === 'defaulter' && rounded >= 75) return;
+        if (filter === 'safe' && rounded < 75) return;
+
+        let recoveryMsg = '';
+        if (rounded >= 75) {
+          const bunkable = Math.floor((100 * c.attended - 75 * c.total) / 75);
+          recoveryMsg = bunkable > 0 
+            ? `<span class="text-emerald-600 dark:text-emerald-400 font-semibold"><i class="fa-solid fa-umbrella-beach mr-1"></i>Can bunk ${bunkable} lecture(s)</span>`
+            : `<span class="text-slate-500"><i class="fa-solid fa-shield mr-1"></i>On track (Cannot bunk next)</span>`;
+        } else {
+          const needed = Math.ceil((75 * c.total - 100 * c.attended) / (100 - 75));
+          recoveryMsg = `<span class="text-rose-600 dark:text-rose-400 font-semibold"><i class="fa-solid fa-arrow-trend-up mr-1"></i>Need next ${needed} consecutive class(es)</span>`;
+        }
+
+        let badgeBg = 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800';
+        let barColor = 'bg-emerald-500';
+
+        if (rounded < 60) {
+          badgeBg = 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300 border-rose-200 dark:border-rose-800';
+          barColor = 'bg-rose-500';
+        } else if (rounded < 75) {
+          badgeBg = 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300 border-amber-200 dark:border-amber-800';
+          barColor = 'bg-amber-500';
+        }
+
+        const card = document.createElement('div');
+        card.className = 'bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm flex flex-col justify-between hover:border-indigo-300 dark:hover:border-indigo-800 transition';
+
+        card.innerHTML = `
+          <div>
+            <div class="flex items-start justify-between gap-2 mb-2">
+              <div>
+                <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">${c.type}</span>
+                <h4 class="font-bold text-base text-slate-900 dark:text-white mt-1 leading-snug">${c.name}</h4>
+                <div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">${c.faculty || 'Dept. Staff'}</div>
+              </div>
+              <span class="text-[11px] font-bold px-2 py-0.5 rounded-full border ${badgeBg} whitespace-nowrap">
+                ${rounded}%
+              </span>
+            </div>
+
+            <!-- Stats Bar -->
+            <div class="my-3">
+              <div class="flex justify-between text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                <span>Attended: <strong>${c.attended}</strong> / ${c.total}</span>
+                <span class="text-slate-400 font-normal">MU Target: 75%</span>
+              </div>
+              <div class="w-full bg-slate-100 dark:bg-slate-800 h-2.5 rounded-full overflow-hidden p-0.5">
+                <div class="h-full rounded-full ${barColor}" style="width: ${Math.min(100, Math.max(0, rounded))}%"></div>
+              </div>
+            </div>
+
+            <div class="text-xs p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 mb-4">
+              ${recoveryMsg}
+            </div>
+          </div>
+
+          <!-- Bottom Stepper Controls -->
+          <div class="flex items-center justify-between gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+            <button onclick="editCourseModal('${c.id}')" class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 text-xs" title="Edit Numbers">
+              <i class="fa-solid fa-pen-to-square"></i>
+            </button>
+
+            <div class="flex items-center gap-1.5">
+              <button onclick="quickStep('${c.id}', 'attend', 1)" class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-emerald-50 dark:bg-emerald-950/70 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 border border-emerald-200 dark:border-emerald-800" title="Add 1 Attended class">
+                +1 Present
+              </button>
+              <button onclick="quickStep('${c.id}', 'bunk', 1)" class="px-2.5 py-1 text-xs font-semibold rounded-lg bg-rose-50 dark:bg-rose-950/70 text-rose-700 dark:text-rose-300 hover:bg-rose-100 border border-rose-200 dark:border-rose-800" title="Add 1 Missed class">
+                +1 Absent
+              </button>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // QUICK STEPPER
+    function quickStep(courseId, action, amount) {
+      const c = courses.find(item => item.id === courseId);
+      if (!c) return;
+
+      if (action === 'attend') {
+        c.attended = (c.attended || 0) + amount;
+        c.total = (c.total || 0) + amount;
+        showToast(`+${amount} Present: ${c.code || c.name}`);
+      } else if (action === 'bunk') {
+        c.total = (c.total || 0) + amount;
+        showToast(`+${amount} Absent: ${c.code || c.name}`, false);
+      }
+
+      saveData();
+    }
+
+    // TIMETABLE VIEWER
+    function openTimetableModal() {
+      const container = document.getElementById('fullTimetableViewer');
+      container.innerHTML = '';
+
+      const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+      days.forEach(day => {
+        const slots = D2_SCHEDULE[day] || [];
+        const dayCard = document.createElement('div');
+        dayCard.className = 'border border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden';
+
+        let slotsHtml = slots.map(s => {
+          if (s.isBreak) {
+            return `
+              <div class="px-3 py-1.5 bg-slate-50 dark:bg-slate-800/40 text-[11px] text-slate-400 flex justify-between italic">
+                <span><i class="fa-solid fa-utensils mr-1"></i>${s.title}</span>
+                <span>${s.time}</span>
+              </div>
+            `;
+          }
+          return `
+            <div class="px-3 py-2 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs">
+              <div class="flex items-center gap-2">
+                <span class="font-bold text-slate-800 dark:text-slate-200">${s.title}</span>
+                ${s.isLab ? '<span class="px-1.5 py-0.5 rounded text-[10px] bg-violet-100 dark:bg-violet-950 text-violet-700 dark:text-violet-300 font-semibold">D2 Lab</span>' : ''}
+              </div>
+              <div class="text-[11px] text-slate-500 flex items-center gap-2">
+                <span>${s.time}</span>
+                <span>&bull;</span>
+                <span class="font-mono text-indigo-600 dark:text-indigo-400">${s.room || 'Room 304'}</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        dayCard.innerHTML = `
+          <div class="px-3 py-2 bg-slate-100 dark:bg-slate-800/80 font-bold text-xs flex justify-between items-center text-slate-800 dark:text-slate-200">
+            <span>${day}</span>
+            <span class="text-[11px] font-normal text-slate-500">${slots.length} events</span>
+          </div>
+          <div class="divide-y divide-slate-100 dark:divide-slate-800">${slotsHtml}</div>
+        `;
+        container.appendChild(dayCard);
+      });
+
+      document.getElementById('timetableModal').classList.remove('hidden');
+    }
+
+    function closeTimetableModal() {
+      document.getElementById('timetableModal').classList.add('hidden');
+    }
+
+    // EDIT / ADD COURSE MODAL
+    function openAddCourseModal() {
+      document.getElementById('courseModalTitle').textContent = 'Add Custom Subject/Lab';
+      document.getElementById('editCourseId').value = '';
+      document.getElementById('courseNameInput').value = '';
+      document.getElementById('courseTypeInput').value = 'Theory';
+      document.getElementById('courseTargetInput').value = 75;
+      document.getElementById('courseAttendedInput').value = 0;
+      document.getElementById('courseTotalInput').value = 0;
+      document.getElementById('courseModal').classList.remove('hidden');
+    }
+
+    function editCourseModal(id) {
+      const c = courses.find(item => item.id === id);
+      if (!c) return;
+
+      document.getElementById('courseModalTitle').textContent = `Edit ${c.name}`;
+      document.getElementById('editCourseId').value = c.id;
+      document.getElementById('courseNameInput').value = c.name;
+      document.getElementById('courseTypeInput').value = c.type;
+      document.getElementById('courseTargetInput').value = c.target || 75;
+      document.getElementById('courseAttendedInput').value = c.attended || 0;
+      document.getElementById('courseTotalInput').value = c.total || 0;
+      document.getElementById('courseModal').classList.remove('hidden');
+    }
+
+    function closeCourseModal() {
+      document.getElementById('courseModal').classList.add('hidden');
+    }
+
+    function handleCourseSubmit(e) {
+      e.preventDefault();
+      const id = document.getElementById('editCourseId').value;
+      const name = document.getElementById('courseNameInput').value.trim();
+      const type = document.getElementById('courseTypeInput').value;
+      const target = parseInt(document.getElementById('courseTargetInput').value) || 75;
+      const attended = parseInt(document.getElementById('courseAttendedInput').value) || 0;
+      const total = parseInt(document.getElementById('courseTotalInput').value) || 0;
+
+      if (attended > total) {
+        showToast('Attended cannot be greater than Total classes held!', false);
+        return;
+      }
+
+      if (id) {
+        const c = courses.find(item => item.id === id);
+        if (c) {
+          c.name = name;
+          c.type = type;
+          c.target = target;
+          c.attended = attended;
+          c.total = total;
+          showToast(`Updated ${c.code || c.name}`);
+        }
+      } else {
+        const newCourse = {
+          id: 'c-custom-' + Date.now(),
+          code: name.slice(0, 5).toUpperCase(),
+          name: name,
+          faculty: 'Faculty Staff',
+          type: type,
+          target: target,
+          attended: attended,
+          total: total
+        };
+        courses.push(newCourse);
+        showToast(`Added ${name}`);
+      }
+
+      saveData();
+      closeCourseModal();
+    }
+
+    // SETTINGS / DATA BACKUP / RESET MODALS
+    function openSettingsModal() {
+      document.getElementById('settingsModal').classList.remove('hidden');
+    }
+
+    function closeSettingsModal() {
+      document.getElementById('settingsModal').classList.add('hidden');
+    }
+
+    function exportData() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(courses, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `FE_C_IT_Batch_D2_Attendance_${new Date().toISOString().slice(0,10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      showToast('Attendance backup downloaded!');
+    }
+
+    function importData(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          const imported = JSON.parse(evt.target.result);
+          if (Array.isArray(imported)) {
+            courses = imported;
+            saveData();
+            showToast('Attendance imported successfully!');
+            closeSettingsModal();
+          } else {
+            showToast('Invalid backup file format.', false);
+          }
+        } catch(err) {
+          showToast('Failed to parse JSON file.', false);
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // DAY SELECTION & TABS
+    function setScheduleDay(day) {
+      selectedDay = day;
+      renderDaySchedule();
+    }
+
+    function detectDayOfWeek() {
+      const dayIndex = new Date().getDay();
+      const map = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+      const today = map[dayIndex];
+      selectedDay = (today === 'Sunday') ? 'Monday' : today;
+    }
+
+    function switchTab(tabId) {
+      const tabs = ['today', 'subjects'];
+      tabs.forEach(t => {
+        const section = document.getElementById(`tab-${t}`);
+        const btn = document.getElementById(`tab${t.charAt(0).toUpperCase() + t.slice(1)}Btn`);
+        if (t === tabId) {
+          section.classList.remove('hidden');
+          btn.className = 'tab-button pb-3 border-b-2 border-indigo-600 text-indigo-600 dark:text-indigo-400 flex items-center gap-2 font-semibold';
+        } else {
+          section.classList.add('hidden');
+          btn.className = 'tab-button pb-3 border-b-2 border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300 flex items-center gap-2 font-semibold';
+        }
+      });
+    }
+
+    // THEME SYSTEM
+    function initTheme() {
+      if (safeGet('theme') === 'dark' || (!safeGet('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    }
+
+    function toggleDarkMode() {
+      if (document.documentElement.classList.contains('dark')) {
+        document.documentElement.classList.remove('dark');
+        safeSet('theme', 'light');
+      } else {
+        document.documentElement.classList.add('dark');
+        safeSet('theme', 'dark');
+      }
+    }
+
+    // TOAST NOTIFICATIONS
+    function showToast(message, isSuccess = true) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toastMessage');
+      const toastIcon = document.getElementById('toastIcon');
+
+      toastMsg.textContent = message;
+      if (isSuccess) {
+        toastIcon.className = 'fa-solid fa-circle-check text-emerald-400 dark:text-emerald-600';
+      } else {
+        toastIcon.className = 'fa-solid fa-triangle-exclamation text-amber-400 dark:text-amber-500';
+      }
+
+      toast.classList.remove('translate-y-16', 'opacity-0');
+      setTimeout(() => {
+        toast.classList.add('translate-y-16', 'opacity-0');
+      }, 2500);
+    }
+
+    // STARTUP
+    window.onload = function() {
+      initTheme();
+      loadData();
+      detectDayOfWeek();
+      updateAppUI();
+    };
+  </script>
+</body>
+</html>
